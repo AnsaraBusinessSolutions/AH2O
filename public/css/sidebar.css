@@ -1,0 +1,16 @@
+.navbar-sidebar{
+    width: auto;
+    position: fixed;
+    height: auto;
+    min-height: 100vh;
+}
+.navbar-sidebar > ul.navbar-nav{
+    display:list-item;
+    margin-bottom: auto;
+}
+.navbar-sidebar-left{
+    left: 0;
+}
+.navbar-sidebar-right{
+    right:0;
+}
