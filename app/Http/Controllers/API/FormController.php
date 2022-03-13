@@ -66,7 +66,7 @@ class FormController extends Controller
       $validator = \Validator::make($request->all(),$rules);
       if($validator->passes()){
         $form_name = $request->formname?$request->formname:"";
-        $form_template  = \DB::table("form_template")->select("template_content")->where("name",$form_name)->get();
+        $form_template  = \DB::table("form_template")->select("template_content","template_form_url")->where("name",$form_name)->get();
         if(count($form_template)>0){
           $template_content = $form_template[0]->template_content?$form_template[0]->template_content:"";
           $template_content = json_decode($template_content,true);
@@ -83,7 +83,7 @@ class FormController extends Controller
         if($response_data!=""){
           $html = $response_data;
           $form_name = $request->formname?$request->formname:'';
-          $htmlresponse = view("form.update",["result"=>$result,"html"=>$html,"formname"=>$form_name])->render();
+          $htmlresponse = view("form.update",["result"=>$result,"html"=>$html,"formname"=>$form_name,"url"=>$form_template[0]->template_form_url])->render();
         }
         else{
           $result = "failed";

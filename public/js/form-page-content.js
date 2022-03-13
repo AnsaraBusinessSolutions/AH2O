@@ -108,10 +108,15 @@ function getEvents(){
             let html = editElement(nodename,e.target.getAttribute("name"),disabled_ap );
             console.log(nodename);
             console.log(html);
+            let title = "Edit "+e.target.nodeName;
             $("#dataAlterModal > .modal-dialog > .modal-content > .modal-body").html("").html(html);
             if(nodename=='select'){
                 getEvents();
                 $("#dataAlterModal > .modal-dialog > .modal-content > .modal-body > div.row").css("display","flex");
+                title = "Edit Select";
+            }
+            if($("#dataAlterModalLabel").length){
+                $("#dataAlterModalLabel").html(title);
             }
         //    else{
 
@@ -267,6 +272,17 @@ function saveElement(element,nodename){
             }
             }
         });//''
+    }
+    $("#dataAlterModal").modal("hide");
+}
+function removeElement(element){
+    console.log(element);
+    if($(element).length){
+        //let parent_element = $(element).parent("row");
+        $(element).parent("div.row").remove();
+    }
+    else{
+        console.log("element is not available");
     }
 }
 function save_template_with_url(form_name=''){

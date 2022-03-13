@@ -64,7 +64,7 @@
     </div>
     <div class='col-md-6 template_url_content_get' style="display:none">
             <label class='form-label'>Enter URL to Store Form Data</label>
-            <input type='text' class="form-control" name='template_form_url' id='template_form_url' value="">
+            <input type='text' class="form-control" name='template_form_url' id='template_form_url' value="{{ isset($url)?$url:'' }}">
     </div>
     <div class='row option_element_random col-md-12' style="display:none">
           <input    type="text" name="select_option_element_random" class="form-control col-md-6" value="">&nbsp;&nbsp;
