@@ -182,7 +182,8 @@ var save_form = function(form_name="generated_form"){
     });//''
    //console.log(elements_list);
    //return false;//'
-    let form_template_name = $("#form_template_name").val();
+   
+   let form_template_name = $("#form_template_name").val();
     $.ajax({
         url:"/api/form-template-save",
         type:"POST",
@@ -214,7 +215,11 @@ function getElements(elem,classname="",position=0){
         }
         else{
             //if the child element is not div then this will work
-        element_lst[index_element]= getAttributesandProperties($(elem).children().get(i),(position==0?(i+1):(position)));
+            if($(elem).children().get(i).tagName=="SELECT"){
+                element_lst[index_element] = getAttributesandPropertiesSelect($(elem).children().get(i),(position==0?(i+1):(position)));
+            }
+            else
+            element_lst[index_element]= getAttributesandProperties($(elem).children().get(i),(position==0?(i+1):(position)));
         }
         
     }
@@ -248,6 +253,35 @@ function getAttributesandProperties(elem,position=0){
 //    console.log($(elem).text());
     element_data["tagname"]=elem.tagName.toLowerCase();
     return element_data;   
+}
+function getAttributesandPropertiesSelect(elem,position){
+    let attributes = elem.attributes;
+    let element_data = {};
+
+    for(let i=0;i<attributes.length;i++){
+        
+        element_data[attributes[i].nodeName] = attributes[i].nodeValue;
+        //console.log(attributes[i] +" "+$(elem).hasAttr(attributes[i]));
+    }
+    if($(elem).text()!=""){
+        element_data["content"] = $(elem).text();
+    }
+    if(!(element_data && element_data["value"])){
+        element_data["value"] = $(elem).val();
+    }
+    console.log("Position : "+position);
+    if(position){
+        element_data["position"] = position;
+    }
+//    console.log($(elem).text());
+    element_data["tagname"]=elem.tagName.toLowerCase();
+    let options = [];
+    $(elem).find("option").each(function(){
+        if($(this).text()!="")
+        options.push($(this).text());
+    });
+    element_data["options"] = options;//'
+    return element_data;//'
 }
 function editForm(form_name){
     $.ajax({

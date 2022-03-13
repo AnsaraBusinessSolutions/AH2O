@@ -248,7 +248,13 @@ class FormController extends Controller
               $onclick = isset($params["onclick"])?("onclick='".$params["onclick"]."'"):"";
               $value=(isset($params["value"]))?("value='".$params["value"]."'"):"";
               $html ="<".$params["tagname"]." ".($type!=""?$type:"")." ".($name!=""?$name:"")." ".($class!=""?$class:"")." ".($for!=""?$for:"")." ".$onclick." ".$value.">".(isset($params["content"])?$params["content"]:"");
-              if(in_array($params["tagname"],["label","button","textarea"])){
+              if(isset($params["options"])){
+                foreach($params["options"] as $option){
+                  $html .= "<option value='".str_replace(" ","_",$option)."'>".$option."</option>";
+                }
+              }
+
+              if(in_array($params["tagname"],["label","button","textarea","select"])){
                 $html .= "</".$params["tagname"].">";
               }
 

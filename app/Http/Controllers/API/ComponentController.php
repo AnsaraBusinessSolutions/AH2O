@@ -28,6 +28,7 @@ class ComponentController extends Controller
             $content = $request->content?$request->content:"";
             $rows = $request->rows?$request->rows:7;
             $column_size = $request->column_size?$request->column_size:"";
+            $value = $request->value?$request->value:"";
             $html = "";
             if($input){
                     //$this->input = "get".ucfirst($input)."('".$name."','".$class."','')";
@@ -77,7 +78,7 @@ class ComponentController extends Controller
                             $html = $this->getInputsPhone($name,$class,"");
                             break;
                         case 'inputs-select':
-                            $html = $this->getInputsSelect($name,$class,$val);
+                            $html = $this->getInputsSelect($name,$class,$value);
                             break;
                             default:
                             $html = "<p>There is no available fields or type of input you mentioned.</p>";
@@ -176,7 +177,7 @@ class ComponentController extends Controller
     }
     public function getInputsSelect($name="",$class="",$value=[],$multiple=""){
         $html = "<select name='".$name."' class='".$class."'>";
-        if(is_array($value)){
+        if(is_array($value) && empty($value)==false){
             foreach($value as $key=>$val){
                 $html .= "<option value='".$key."'>".$val."</option>";
             }

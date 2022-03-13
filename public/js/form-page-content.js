@@ -2,10 +2,10 @@ var nodeNamesWithContent = ["label","button"];
 var nodeNamesWithValue = ["input","textarea"];
 jQuery(function(){
     var nodeNames = [];
-    
+
     $(".list-group-item").on("click",function(){
             let html = "";
-            html = getHtml($(this));      
+            html = getHtml($(this));
     }); //''
     $(".clear-all").on("click",function(){
             $(".form-creation-area").html("");
@@ -58,13 +58,14 @@ jQuery(function(){
             alert("Difficulty in removing the element");
         }
     });
+
     getEvents();
 });
 function getHtml(element){
     let name = $(element).data("element")+"_"+Math.ceil(Math.random() * 1000000);
     $.ajax({
         url : "/api/get-element-from-list",
-        type:"GET",        
+        type:"GET",
         data:{name:name,class:$(element).data("class"),content:$(element).data("placeholder"),input_type:$(element).data("element"),element_type:$(element).data("element-type")},
         success:function(response){
             if(response.result=="success"){
@@ -105,12 +106,23 @@ function getEvents(){
             console.log($(e.target));
             $("#dataAlterModal > .modal-dialog > .modal-content > .modal-footer > button[name='save']").attr("onclick","saveElement('"+e.target.getAttribute("name")+"','"+nodename+"')");
             let html = editElement(nodename,e.target.getAttribute("name"),disabled_ap );
+            console.log(nodename);
+            console.log(html);
             $("#dataAlterModal > .modal-dialog > .modal-content > .modal-body").html("").html(html);
+            if(nodename=='select'){
+                getEvents();
+                $("#dataAlterModal > .modal-dialog > .modal-content > .modal-body > div.row").css("display","flex");
+            }
+        //    else{
+
+        //    }
             $(".edit-button").css({ "left":x, "right":y, "top":top, "display":"block"  ,"position":"absolute"});//s
             $(".delete-button").data("element",e.target.getAttribute("name")).css({"left":(position.x + position.width + 80), "right":y, "top":top, "display":"block", "position":"absolute"});
             console.log($(".edit-button"));
         }
     });
+    console.log("Button : "+$("button[name='add_option']").length);
+
 }
 function previewHtml(form_name="template_form_creation"){
     if(form_name!=""){
@@ -122,10 +134,36 @@ function previewHtml(form_name="template_form_creation"){
     }
 }
 function editElement(node, input_name="",disabled_ap=[]){
-    
+
     let attributes = $(node+"[name='"+input_name+"']")[0].attributes;
-    
-    let html = "<div class='container'>";
+    html = "";
+    if(node=="select"){
+        html = getOptionsHtml("select","select");
+        if($(node+"[name='"+input_name+"'] > option").length){
+            $(""+node+"[name='"+input_name+"'] > option").each(function(){
+                if($(this).val()!=""){
+                let html_content = $("div.option_element_random").get(0).outerHTML;
+                let random = Math.ceil(Math.random() * 100000);
+                html_content = html_content.replaceAll("option_element_random","option_element_"+random);
+                html_content = html_content.replaceAll("value","value='"+$(this).text()+"'");//''
+                //$("div#dataAlterModal  > .modal-dialog > .modal-content > .modal-body").append(html_content);
+                //$(".option_element_"+random).find("input").val($(this).text());
+                //$(".option_element_"+random).css("display","none");
+                //$(".option_element_"+random).find("input").val($(this).text());
+                console.log($(this).text());
+                html += html_content;
+                }
+                //else{
+                //    html += getOptionsHtml();
+                //}
+            });
+            console.log(html);
+        }
+        else
+        html = getOptionsHtml(node,input_name,disabled_ap);
+    }
+    else{
+    html = "<div class='container'>";
     for(let i=0;i<attributes.length;i++){
         console.log(attributes[i].nodeName +" "+attributes[i].nodeValue);
         if(attributes[i].nodeName=="for"){
@@ -146,6 +184,18 @@ function editElement(node, input_name="",disabled_ap=[]){
     }
 
     html += "</div>";
+    }
+    return html;
+}
+function getOptionsHtml(node,input_name,disabled_ap=[]){
+    let html = "";
+    if(node=="select"){
+        let random = Math.ceil(Math.random() * 1000000);
+        html += "<div class=' row option_element_"+random+" col-md-12'>";
+        html += "<input type='text' name='"+input_name+"_option_"+random+"' class='form-control col-md-6' value=''> &nbsp;&nbsp;";
+        html += "<button type='button' name='add_option' class='btn btn-primary add_option' onclick='add_option(this)'>add</button>";
+        html += "</div>";
+    }
     return html;
 }
 function getFor(attributes,input_name){
@@ -160,10 +210,43 @@ function getFor(attributes,input_name){
     html += "</div>";
     return html;
 }
+function add_option(element){
+    //$("button[name='add_option']").on("click",function(){
+        console.log("the add_button click");
+        console.log($("div.option_element_random"));
+        let html = $("div.option_element_random").get(0).outerHTML;//.html();
+        let random = Math.ceil(Math.random() * 100000);
+        console.log(html);
+        html = html.replaceAll("option_element_random","option_element_"+random);
+
+        console.log(html);
+        let value = $(element).siblings("input").val();
+        if($("#dataAlterModal").is(":visible")){
+            $("#dataAlterModal .modal-body").append(html);
+        }
+        else{
+            $(html).insertAfter($(element));
+        }
+
+        $(".option_element_"+random).css("display","block");
+        $(".option_element_"+random).find("input").val(value);
+        $(element).siblings("input").val("");
+        //});//''
+}
 function saveElement(element,nodename){
     let attributes = ["content"];
     console.log(element+" "+nodename);
-
+    if(nodename=='select'){
+        html = "<option value=''>Please Select</option>";
+        $("#dataAlterModal .modal-body").find("div.row").each(function(){
+                if($(this).find("button[name='remove_option']").length){
+                    let input_value = $(this).find("input").val();
+                    html += "<option value='"+input_value.replaceAll(" ","_")+"'>"+input_value+"</option>";
+                }
+        });
+        $("select[name='"+element+"']").html(html);
+    }
+    else{
     $("[name^='"+element+"_']").each(function(){
             let param_name = "";
             param_name = name_split = $(this).attr("name");
@@ -184,6 +267,7 @@ function saveElement(element,nodename){
             }
             }
         });//''
+    }
 }
 function save_template_with_url(form_name=''){
     if(form_name!=''){
