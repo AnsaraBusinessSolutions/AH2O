@@ -56,6 +56,14 @@ Route::get("users-menu-create","API\UserController@createUser")->name("createUse
 Route::post("user-create-admin","API\UserController@createUserPost")->name("createUserPost")->middleware("auth-middleware");
 Route::post("verify-user","API\AuthenticationController@verifyUser")->name("verifyUser");
 Route::post("verify-pin","API\AuthenticationController@verifyemailpin")->name("verifyemailpin");
+Route::get("users-menu-role","API\RoleController@roleList")->name("roleList");
+Route::get("create-role","API\RoleController@createRole")->name("createRole");
+Route::post("store-role","API\RoleController@storeRole")->name("storeRole");
+Route::post("update-status","API\RoleController@updateRoleStatus")->name("updateRoleStatus");
+Route::get("create-page","API\PageController@createPage")->name("createPage");
+Route::post("create-new-page","API\PageController@createNewPage")->name("createNewPage");
+Route::get("list-page","API\PageController@listPages")->name("listPages");
+Route::get("page-disp-user","API\PageController@displayPage")->name("displayPage");
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
