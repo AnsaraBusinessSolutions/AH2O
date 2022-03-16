@@ -1,0 +1,2 @@
+@section("footer-scripts")
+@endsection
