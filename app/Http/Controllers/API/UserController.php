@@ -141,7 +141,8 @@ class UserController extends Controller
         //print_r(session()->get($auth_token));
         //exit;//''
     }
-    public function listTable($header,$data){
+    
+    public function listTable($header,$data,$page=""){
         
         $html = "<table class='mb-0 table table-bordered'>";
         if(isset($header) && count($header)){
@@ -164,10 +165,24 @@ class UserController extends Controller
                 
                 //print_r($data[$i]);
                 $html .= "<tr>";
-                $html .= "<td>".$data[$i][$header[0]]."</td>";
-                $html .= "<td>".$data[$i][$header[1]]."</td>";
-                $html .= "<td>".$data[$i][$header[2]]."</td>";
-                $html .= "<td>".$data[$i][$header[3]]."</td>";
+                for($j=0;$j<count($header);$j++){
+                    if($header[$j]=='Active'){
+                        $html .= "<td>
+                        <div class='row'>
+                        <div class='col-md-2 custom-control custom-switch'> 
+                        <input type='checkbox' class='custom-control-input ' id='active_role_".$data[$i][$header[$j]]."' ".($data[$i]["Active"]?'checked="checked"':"").">
+                        <label class='custom-control-label' for='active_role_".$data[$i][$header[$j]]."'>Active</label>
+                        </div>
+                        </div>
+                        </td>";
+                    }
+                    else
+                    $html .= "<td>".$data[$i][$header[$j]]."</td>";
+    
+	        //$html .= "<td>".$data[$i][$header[1]]."</td>";
+                //$html .= "<td>".$data[$i][$header[2]]."</td>";
+                //$html .= "<td>".$data[$i][$header[3]]."</td>";
+                }
                 $html .= "</tr>";
             }
             
