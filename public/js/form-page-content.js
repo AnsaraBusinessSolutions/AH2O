@@ -18,7 +18,12 @@ jQuery(function(){
         if(modal_data!=""){
             $("#dataAlterModal").modal("show");
             $(this).css("display","none");
+            $(".delete-button").css("display","none");
         }
+    });
+    $("#dataAlterModal").on("shown.bs.modal",function(){
+        $(".edit-button").css("display","none");
+        $(".delete-button").css("display","none");
     });
     $("#save_form_template").on("click",function(){
         let template_name = $("#form_template_name").val();
@@ -109,6 +114,7 @@ function getEvents(){
             console.log(nodename);
             console.log(html);
             let title = "Edit "+e.target.nodeName;
+             
             $("#dataAlterModal > .modal-dialog > .modal-content > .modal-body").html("").html(html);
             if(nodename=='select'){
                 getEvents();
@@ -132,7 +138,7 @@ function getEvents(){
 function previewHtml(form_name="template_form_creation"){
     if(form_name!=""){
         let html = $("form[name='"+form_name+"'] > .form-creation-area").html();
-        $("#dataAlterModal > div.modal-dialog > div.modal-content > div.modal-header > div.modal-title").html("Preview Form");
+        $("#dataAlterModalLabel").html("Preview Form");
         html = "<div class='container'>"+html+"</div>";//s
         $("#dataAlterModal > div.modal-dialog > div.modal-content > div.modal-body").html(html);
         $("#dataAlterModal").modal("show");
@@ -166,6 +172,11 @@ function editElement(node, input_name="",disabled_ap=[]){
         }
         else
         html = getOptionsHtml(node,input_name,disabled_ap);
+
+        if(position_available($(node+"[name='"+input_name+"']")[0])){
+            html += position_list($(node+"[name='"+input_name+"']")[0]);
+        }
+
     }
     else{
     html = "<div class='container'>";
@@ -187,7 +198,9 @@ function editElement(node, input_name="",disabled_ap=[]){
         html += "<input type='text' class='form-control' name='"+input_name+"_content' value='"+$(node+"[name='"+input_name+"']").text()+"'>";
         html += "</div>";
     }
-
+    if(position_available($(node+"[name='"+input_name+"']")[0])){
+        html += position_list($(node+"[name='"+input_name+"']")[0]);
+    }
     html += "</div>";
     }
     return html;
@@ -215,6 +228,63 @@ function getFor(attributes,input_name){
     html += "</div>";
     return html;
 }
+//Verify the possitions available for the element to change
+function position_available(element){
+ let previous_element =0;
+ let next_element = 0;
+    if($(element).parent().prev().length){
+        previous_element = $(element).parent().prev().length;
+    }
+    if($(element).parent().next().length){
+        next_element = $(element).parent().next().length;
+    }
+    return (previous_element + next_element);
+}
+//find the list of position available for the element
+function position_list(element){
+    let option_list = [];
+    let previousall_option_list = {};
+    let nextall_option_list = {};
+    console.log("previous element");
+    $(element).parent().prevAll().each(function(elm,elmcont){
+        let nodename = $(this).children() .get(0).textContent;
+        let nodeNameAdded = $(elmcont).children()?.get(0)?.getAttribute("name");
+               console.log(nodeNameAdded);
+        if(nodeNameAdded){
+            nodename= $(this).children().get(0).nodeName;       
+        previousall_option_list["insert_before_"+nodeNameAdded] = [];
+        previousall_option_list["insert_before_"+nodeNameAdded].push("Insert Before "+nodename);
+        }
+        else{
+            console.log("prev element");
+            console.log($(this).children().get(0));//i
+        }
+    });
+    console.log("next element");
+    $(element).parent().nextAll().each(function(elm,elmcont){
+        console.log(elmcont);
+        let nodename = $(this).children().get(0).textContent;
+        let nodeNameAdded = $(elmcont).children().get(0).getAttribute("name");
+        nodename= $(this).children().get(0).nodeName;
+        nextall_option_list["insert_after_"+nodeNameAdded] = [];
+        nextall_option_list["insert_after_"+nodeNameAdded].push("Insert After "+nodename);
+    });
+    console.log(previousall_option_list);
+    console.  log(nextall_option_list ) ;
+    let html = "<select name='inserting_elements_before_after' class='form-control'>";
+    html += "<option value=''>Select Position</option>";
+    for(var prop in previousall_option_list){
+        html += "<option value='"+prop+"'>"+previousall_option_list[prop]+"</option>";
+    }
+    for(var prop in nextall_option_list){
+        html += "<option value='"+prop+"'>"+nextall_option_list[prop]+"</option>";
+    }
+    html += "</select>"; 
+    temp_html = "<div class='row col-md-12'><label class='form-label'>Change to other Position</label>";
+    temp_html += html;
+    temp_html += "</div>";
+    return temp_html;
+}
 function add_option(element){
     //$("button[name='add_option']").on("click",function(){
         console.log("the add_button click");
@@ -227,13 +297,14 @@ function add_option(element){
         console.log(html);
         let value = $(element).siblings("input").val();
         if($("#dataAlterModal").is(":visible")){
-            $("#dataAlterModal .modal-body").append(html);
+            //$().append(html);
+            $(html).insertAfter($("#dataAlterModal .modal-body div[class*='option_element_']:last"));
         }
         else{
             $(html).insertAfter($(element));
         }
 
-        $(".option_element_"+random).css("display","block");
+        $(".option_element_"+random).css("display","flex");
         $(".option_element_"+random).find("input").val(value);
         $(element).siblings("input").val("");
         //});//''
@@ -272,6 +343,24 @@ function saveElement(element,nodename){
             }
             }
         });//''
+    }
+    let position_change = $("select[name='inserting_elements_before_after']").val();
+    if(position_change==""){
+        console.log("no position change is required");
+    }
+    else if(position_change.startsWith("insert_before")){
+            console.log(position_change);
+            let position_changefor_param = position_change.replace("insert_before_","");
+            console.log("From Element :"+nodename+"[name='"+position_changefor_param+"']");
+            console.log("To Element : "+"[name='"+position_changefor_param+"']");
+            $($(nodename+"[name='"+element+"']").parent("div")).insertBefore($("[name='"+position_changefor_param+"']").parent("div"));
+    }
+    else if(position_change.startsWith("insert_after")){
+        let position_changeparam = position_change.replace("insert_after_","");
+        $($(nodename+"[name='"+element+"']").parent("div")).insertAfter($("[name='"+position_changeparam+"']").parent("div"));
+    }
+    else{
+            console.log("Position change is not able to be done");
     }
     $("#dataAlterModal").modal("hide");
 }
