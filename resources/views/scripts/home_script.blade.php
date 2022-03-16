@@ -49,7 +49,10 @@ setTimeout(function(){
 				html +=	"</div>";
 				$(".display_content_area").html(html);*/
 				if(response.sidebar.update_sidebar){
-					$("#wrapper").html(response.sidebar.sidebar);
+					//$("#wrapper").html(response.sidebar.sidebar);
+					console.log(response.sidebar)		;
+					$(".nav-menu-dynamic").append(response.sidebar.sidebar);
+					pageClick();
 				}	
 				if(response.topbar){
 					//$("#navbarSupportedContent").find("ul.navbar-nav:last").html(response.topbar);

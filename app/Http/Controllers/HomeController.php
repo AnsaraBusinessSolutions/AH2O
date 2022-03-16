@@ -10,6 +10,7 @@ use App\Models\AuthenticationMethod;
 use App\User;
 use JWTAuth;
 use Session;
+use App\Models\Pages;
 
 class HomeController extends Controller
 {
@@ -117,7 +118,15 @@ class HomeController extends Controller
 			//print_r($data);
 			//exit;
 		}
-		$html = view("components.sidebar",["sideMenu"=>$setting_value])->render();	
+		$sidebar = "";
+		$page_list = Pages::where("id",">",0)->select("pages.id as ID","pagename as PageName","pagetitle as PageTitle")->get();
+		$sidebar.= "<li class='app-sidebar__heading'>Admin Page List</li><li>";
+		foreach($page_list as $page){
+			$sidebar .= "<a href='#' class='pages page-disp-user ".$page->PageName."' data-page='".$page->PageName."'>".$page->PageTitle."</a>";
+		}
+		$sidebar .= "</li>";
+		$html= 		$sidebar;
+		//$html = view("components.sidebar",["sideMenu"=>$setting_value])->render();	
 		return $html;
 	} 
 	else{

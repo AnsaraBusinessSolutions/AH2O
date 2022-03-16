@@ -682,6 +682,7 @@
                                 </li>
                                 @endIf
                                 @if(Auth::user()->role==1 || Auth::user()->role==2)
+                                <span class='nav-menu-dynamic'>
                                 <li class="app-sidebar__heading">Users</li>
                                 <li>
                                     <a class="users users-menu-create" href="#"> <!-- href="dashboard-boxes.html"-->
@@ -692,7 +693,16 @@
                                         <i class="metismenu-icon pe-7s-users"></i>
                                         Users
                                     </a>
+                                    <a class="users users-menu-role" href="#"> <!-- href="dashboard-boxes.html"-->
+                                        <i class="metismenu-icon pe-7s-user"></i>
+                                        Users Role
+                                    </a>
                                 </li>
+                                </li>
+                                </span>
+                                @endIf
+                                @if(Auth::user()->role>1)
+                                    
                                 @endIf
                                 @if(Auth::user()->role==1)
                                 <li class="app-sidebar__heading">Charts</li>
@@ -700,6 +710,17 @@
                                     <a class="charts charts-js" href="#"><!-- href="charts-chartjs.html"-->
                                         <i class="metismenu-icon pe-7s-graph2">
                                         </i>ChartJS
+                                    </a>
+                                </li>
+                                <li class='app-sidebar__heading'>Pages</li>
+                                <li>
+                                        <a class='pages create-page' href='#' title='This page can be made visible to users'>
+                                                <i class="metismenu-icon pe-7s-box1"></i>Create Page
+                                        </a>
+                                </li>
+                                <li>
+                                    <a class='pages list-page' href='#' title='This page can be made visible to users'>
+                                            <i class="metismenu-icon pe-7s-box1"></i>Pages
                                     </a>
                                 </li>
                                 @endIf
