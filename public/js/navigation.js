@@ -114,8 +114,10 @@ jQuery(function(){
             }
         });
     });
+    pageClick();
     //''
 
+    //''
 });
 function getGenerateForm(formname="get-generate-form"){
     //$(".get_form").on("click",function(){
@@ -263,9 +265,9 @@ function getAttributesandPropertiesSelect(elem,position){
         element_data[attributes[i].nodeName] = attributes[i].nodeValue;
         //console.log(attributes[i] +" "+$(elem).hasAttr(attributes[i]));
     }
-    if($(elem).text()!=""){
+    /*if($(elem).text()!=""){
         element_data["content"] = $(elem).text();
-    }
+    }*/
     if(!(element_data && element_data["value"])){
         element_data["value"] = $(elem).val();
     }
@@ -276,8 +278,9 @@ function getAttributesandPropertiesSelect(elem,position){
 //    console.log($(elem).text());
     element_data["tagname"]=elem.tagName.toLowerCase();
     let options = [];
+    //fetch the values which are not empty
     $(elem).find("option").each(function(){
-        if($(this).text()!="")
+        if($(this).text()!="" && $(this).val()!="")
         options.push($(this).text());
     });
     element_data["options"] = options;//'
@@ -338,6 +341,47 @@ function postForm(form_name=""){
         error:function(xhr,textStatus,error){
 
         }
+    });
+}
+function pageClick(){
+    $(".pages").off("click").on("click",function(){
+        let class_linked = $(this).attr("class");
+        class_linked = class_linked.replace("pages ","");
+        console.log(class_linked);
+        if(class_linked!=""){
+            datasend = {};
+            console.log(class_linked);
+            if(class_linked.includes("page-disp-user")){
+                class_linked = 'page-disp-user';
+                datasend["page"] = $(this).data("page");
+            }
+            console.log(class_linked);
+            //console.log(data_send);
+            $(".app-main__outer .processing").css("display","block");
+            $(".app-main__outer .display_content_area").css("display","none");
+            $.ajax({
+            url: "/api/"+class_linked,
+            type:"GET",
+            data : datasend ,
+            success:function(response){
+                $(".app-main__outer .processing").css("display","none");
+                $(".app-main__outer .display_content_area").css("display","block");
+                if(response.result=='success'){
+                    $(".app-main__outer .display_content_area").html(response.html);
+                }
+                else{
+                    $(".app-main__outer .display_content_area").html(response.html);
+                }
+            },
+            error:function(xhr,textStatus,error){
+                $(".app-main__outer .processing").css("display","none");
+                $(".app-main__outer .display_content_area").css("display","block");
+            }
+        });
+    }
+    else{
+
+    }
     });
 }
 function getFormData(form_data){
