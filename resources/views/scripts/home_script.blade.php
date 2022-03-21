@@ -12,16 +12,20 @@ $(document).ready(function(){
 	'Authorization':"Bearer "+localStorage.getItem('token')	
         }
 });
-if(localStorage.getItem("reload")==null){
+if($("#app > .app-container").length==0){
         // Set the URL to whatever it was plus "#".
         //url = document.URL+"#";
         //location = "#";
-		let data = localStorage.getItem("reload")?parseInt(localStorage.getItem("reload")):0;
-		localStorage.setItem("reload",(parseInt(data))+1);
-        setTimeout(function(){
+		//let data = localStorage.getItem("reload")?parseInt(localStorage.getItem("reload")):0;
+		//localStorage.setItem("reload",(parseInt(data))+1);
+        
+		setTimeout(function(){
+			$("main #app-content > .processing").css("display","block");
+			$("main #app-content > .display_content_area").css("display","none");
 		//Reload the page
-        location.reload();
-		} ,500);
+        location.reload(true);
+		//window.location.href = window.location.origin+"/home";
+		}  ,1800);
     	}
 setTimeout(function(){
 	$.ajax({
@@ -86,8 +90,50 @@ setTimeout(function(){
 	
 		
 });
+function editUser(user_id){
+	$.ajax({
+		url:"/api/edit-user",
+		data:{
+			edit_user:user_id
+		},
+		type:"POST",
+		success:function(response){
+			if(response.result=="success"){
+				$("#dataAlterModal .modal-title").html(response.title);
+				$("#dataAlterModal .modal-body").html(response.html);
+				$("#dataAlterModal .modal-content button[name='save']").attr("onclick",response.saveUserfunction);
+				$("#dataAlterModal").modal("show");
+			}
+		},
+		error:function(xhr,textStatus,error){
 
-
+		}
+	});
+}
+function saveUser(user_id){
+	$.ajax({
+		url:"/api/save-user",
+		data:{
+			name:$("input[name='name']").val(),
+			role:$("select[name='role']").val(),
+			auth_method:$("select[name='auth_method']").val(),
+			id:$("input[name='user_id']").val()
+		},
+		type:"POST",
+		success:function(response){
+			if(response.result=="success"){
+				$("#dataAlterModal").modal("hide");
+				alert("Saved the user records successfully");
+			}
+			else{
+				alert(response.message);
+			}
+		},
+		error:function(xhr,textStatus,error){
+			alert("Unable to store the user");
+		}
+	})
+}
 
 </script>
 @endsection
